@@ -1,0 +1,8 @@
+program
+
+//this is a test comment
+
+FUNCTION INTEGER main (){
+    vars
+    PRINT("TEST");
+}
