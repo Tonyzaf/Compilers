@@ -1123,7 +1123,7 @@ YY_RULE_SETUP
 case 52:
 YY_RULE_SETUP
 #line 71 "main.l"
-{return T_SPC;}
+return T_SPC;
 	YY_BREAK
 case 53:
 /* rule 53 can match eol */

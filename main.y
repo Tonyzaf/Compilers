@@ -1,32 +1,50 @@
-<translation-unit> ::= {<external-declaration>}*
 
-<letter> ::= {a-z} | {A-Z}
+%{
 
-<digit> ::= {0-9}
 
-<word> ::= <letter> | <digit> | <word> <letter> | <word> <digit>
 
-<program> ::= PROGRAM <function-definition>* <main-function>
+%}
 
-<external-declaration> ::= <function-definition>
-                         | <declaration>
 
-<function-definition> ::= FUNCTION {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement> <return-statement> END_FUNCTION
 
-<declaration-specifier> ::= <storage-class-specifier>
-                          | <type-specifier>
-                          | <type-qualifier>
+%%
 
-<storage-class-specifier> ::= auto
-                            | register
-                            | static
-                            | extern
-                            | typedef
+translation-unit:   external-declaration;    
 
-<type-specifier> ::= CHAR
-                   | INTEGER
+letter: {a-zA-Z};
 
-<variable-init> ::= VARS {<type-specifier> <identifier>;}*
+digit: {0-9};
+
+word: letter | digit | word letter | word digit
+      ;
+
+program: PROGRAM function-definition main-function
+         ;
+
+external-declaration: function-definition
+                    | declaration
+                    ;
+
+function-definition: FUNCTION declaration-specifier* declarator declaration* compound-statement return-statement END_FUNCTION
+                     ;
+
+declaration-specifier: storage-class-specifier
+                     | type-specifier
+                     | type-qualifier
+                     ;
+
+storage-class-specifier: auto
+                       | register
+                       | static
+                       | extern
+                       | typedef
+                       ;
+
+type-specifier: CHAR
+              | INTEGER
+              ;
+
+variable-init: VARS type-specifier identifier ;
                    
 <struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
                               | <struct-or-union> { {<struct-declaration>}+ }
@@ -216,3 +234,5 @@
 <main-function> ::= STARTMAIN <variable-init>? <iteration-statement>* <selection-statement>* <print-statement>* <break-statement>? ENDMAIN 
 
 <line-comment> ::= ^%[ a-zA-Z0-9 ]*
+
+%%

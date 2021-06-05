@@ -68,7 +68,7 @@ other_chars     [.\-_]
 ";"             {printf("Semicolon\n"); return T_SEMICOL;}
 "."             {printf("Dot"); return T_DOT;}
 ","             {printf("Comma"); return T_COMMA;}
-" "             {return T_SPC;}
+" "             return T_SPC;
 "\n"            {printf("New Line\n"); return T_NEWLINE; }
 
 .               {printf("Unknown\n"); return T_UNKNWON;}
