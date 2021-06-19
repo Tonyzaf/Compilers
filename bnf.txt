@@ -85,12 +85,6 @@
 <relational-expression> ::= <shift-expression>
                           | <relational-expression> < <shift-expression>
                           | <relational-expression> > <shift-expression>
-                          | <relational-expression> <= <shift-expression>
-                          | <relational-expression> >= <shift-expression>
-
-<shift-expression> ::= <additive-expression>
-                     | <shift-expression> << <additive-expression>
-                     | <shift-expression> >> <additive-expression>
 
 <additive-expression> ::= <multiplicative-expression>
                         | <additive-expression> + <multiplicative-expression>
@@ -99,25 +93,15 @@
 <multiplicative-expression> ::= <cast-expression>
                               | <multiplicative-expression> * <cast-expression>
                               | <multiplicative-expression> / <cast-expression>
-                              | <multiplicative-expression> % <cast-expression>
 
 <cast-expression> ::= <unary-expression>
                     | ( <type-name> ) <cast-expression>
 
-<unary-expression> ::= <postfix-expression>
-                     | ++ <unary-expression>
+<unary-expression> ::= ++ <unary-expression>
                      | -- <unary-expression>
                      | <unary-operator> <cast-expression>
                      | sizeof <unary-expression>
                      | sizeof <type-name>
-
-<postfix-expression> ::= <primary-expression>
-                       | <postfix-expression> [ <expression> ]
-                       | <postfix-expression> ( {<assignment-expression>}* )
-                       | <postfix-expression> . <identifier>
-                       | <postfix-expression> -> <identifier>
-                       | <postfix-expression> ++
-                       | <postfix-expression> --
 
 <primary-expression> ::= <identifier>
                        | <constant>
@@ -136,16 +120,6 @@
                           | <unary-expression> <assignment-operator> <assignment-expression>
 
 <assignment-operator> ::= =
-                        | *=
-                        | /=
-                        | %=
-                        | +=
-                        | -=
-                        | <<=
-                        | >>=
-                        | &=
-                        | ^=
-                        | |=
 
 <unary-operator> ::= &
                    | *
@@ -165,16 +139,6 @@
 <parameter-declaration> ::= {<declaration-specifier>}+ <declarator>
                           | {<declaration-specifier>}+ <abstract-declarator>
                           | {<declaration-specifier>}+
-
-<enum-specifier> ::= enum <identifier> { <enumerator-list> }
-                   | enum { <enumerator-list> }
-                   | enum <identifier>
-
-<enumerator-list> ::= <enumerator>
-                    | <enumerator-list> , <enumerator>
-
-<enumerator> ::= <identifier>
-               | <identifier> = <constant-expression>
 
 <typedef-name> ::= <identifier>
 
@@ -200,7 +164,7 @@
 
 <expression-statement> ::= {<expression>}? ;
 
-<return-statement> ::= return <word> ;
+<return-statement> ::= RETURN <word> ;
 
 <selection-statement> ::= IF ( <expression> ) THEN <statement> ENDIF
                         | IF ( <expression> ) <statement> {ELSEIF <statement>}+
