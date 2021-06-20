@@ -1,182 +1,115 @@
-<translation-unit> ::= {<external-declaration>}*
+<letter> : {a-z} | {A-Z}
 
-<letter> ::= {a-z} | {A-Z}
+<digit> : {0-9}
 
-<digit> ::= {0-9}
+<word> : <letter> | <digit>  | <word> <letter> | <word> <digit>
 
-<word> ::= <letter> | <digit> | <word> <letter> | <word> <digit>
+<name> : <letter>  | <word> <letter> | <word> <digit>
 
-<program> ::= PROGRAM <function-definition>* <main-function>
+<newline> : \r\n 
 
-<external-declaration> ::= <function-definition>
-                         | <declaration>
+<program> : PROGRAM <name> <newline> <struct> <function> <main-function>
 
-<function-definition> ::= FUNCTION {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement> <return-statement> END_FUNCTION
+<struct> : STRUCT <name> <newline> <variable-init> ENDSTRUCT
+         | TYPEDEF STRUCT <name> <newline> <variable-init> <name> ENDSTRUCT
+         | <struct> <struct>
+         | %empty
 
-<declaration-specifier> ::= <storage-class-specifier>
-                          | <type-specifier>
-                          | <type-qualifier>
+<function> : FUNCTION <name> (<parameters>) <newline>  <function-main-body> <return-statement> END_FUNCTION
+           | <function> <function>
+           | %empty
 
-<storage-class-specifier> ::= auto
-                            | register
-                            | static
-                            | extern
-                            | typedef
+<parameters> : <name> 
+             | <parameters> , <name>
 
-<type-specifier> ::= CHAR
-                   | INTEGER
+<function-main-body> : <variable-init> <program-command>
 
-<variable-init> ::= VARS {<type-specifier> <identifier>;}*
-                   
-<struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
-                              | <struct-or-union> { {<struct-declaration>}+ }
-                              | <struct-or-union> <identifier>
+<return-statement> : RETURN <word> ;
 
-<struct-or-union> ::= struct
-                    | union
+<main-function> : STARTMAIN <variable-init> <program-command> ENDMAIN 
 
-<struct-declaration> ::= {<specifier-qualifier>}* <struct-declarator-list>
+<type-specifier> : CHAR
+                 | INTEGER
 
-<specifier-qualifier> ::= <type-specifier>
-                        | <type-qualifier>
+<variable-init> : VARS <type-specifier> <identifier>;
+                | <variable-init> <variable-init>
+                | %empty
 
-<struct-declarator-list> ::= <struct-declarator>
-                           | <struct-declarator-list> , <struct-declarator>
+<identifier> : <name> | <identifier>, <identifier> | <name>\[{1-9}<number>\]
+                
+<number> : <digit> <number>
+         | <digit>
+         | %empty
 
-<struct-declarator> ::= <declarator>
-                      | <declarator> : <constant-expression>
-                      | : <constant-expression>
+<program-command> : <assign-statement>
+                  | <iteration-statement>
+                  | <selection-statement>
+                  | <print-statement>
+                  | <break-statement>
+                  | <line-comment>
+                  | <program-command> <program-command>
+                  | %empty
 
-<declarator> ::= <direct-declarator>
+<assign-statement> : <name> = <statement>;
 
-<type-qualifier> ::= const
-                   | volatile
+<statement> : <word> 
+            | <digit> 
+            | <statement> <statement> 
+            | (<statement>)
+            | <statement> <unary-operator> <statement>
+              
+<unary-operator> : /
+                 | *
+                 | +
+                 | -
+                 | ^
+                  
+<condition> : <word> <logical-expression> <word> 
+            | <digit> <logical-expression> <digit>
+            | <digit> <logical-expression> <word> 
+            | <word> <logical-expression> <digit>
 
-<direct-declarator> ::= <identifier>
-                      | ( <declarator> )
-                      | <direct-declarator> [ {<constant-expression>}? ]
-                      | <direct-declarator> ( <parameter-type-list> )
-                      | <direct-declarator> ( {<identifier>}* )
+<logical-expression> : >
+                     | <
+                     | ==
+                     | !=
+                     | AND 
+                     | OR
 
-<constant-expression> ::= <conditional-expression>
+<iteration-statement> : WHILE ( <condition> ) <program-command>+ ENDWHILE
+                      | FOR ( <condition> TO {1-9} <number> STEP {1-9} <number> ) <program-command> ENDFOR
 
-<conditional-expression> ::= <logical-or-expression>
-                           | <logical-or-expression> ? <expression> : <conditional-expression>
+<selection-statement> : IF ( <condition> ) THEN <program-command> <elseif> <else> ENDIF
+                      | SWITCH ( <condition> ) <case> <default>{DEFAULT : <program-command>+}? ENDSWITCH
 
-<logical-or-expression> ::= <logical-and-expression>
-                          | <logical-or-expression> OR <logical-and-expression>
+<elseif> : ELSEIF  <program-command> <elseif>
+         | %empty
 
-<logical-and-expression> ::= <inclusive-or-expression>
-                           | <logical-and-expression> AND <inclusive-or-expression>
+<else> : ELSE <program-command>
+       | %empty
 
-<inclusive-or-expression> ::= <exclusive-or-expression>
-                            | <inclusive-or-expression> | <exclusive-or-expression>
+<case> : CASE ( <condition> ) <program-command> <case>   
+       | %empty    
 
-<exclusive-or-expression> ::= <and-expression>
-                            | <exclusive-or-expression> ^ <and-expression>
+<default> : DEFAULT : <program-command> 
+          | %empty
 
-<and-expression> ::= <equality-expression>
-                   | <and-expression> & <equality-expression>
+<print-statement> : PRINT ("<message>" <val>) ;
 
-<equality-expression> ::= <relational-expression>
-                        | <equality-expression> == <relational-expression>
-                        | <equality-expression> != <relational-expression>
+<message> : <word> 
+          | <word> <message>  
+          | %empty
 
-<relational-expression> ::= <shift-expression>
-                          | <relational-expression> < <shift-expression>
-                          | <relational-expression> > <shift-expression>
+<val> : , [ <word> ] <val>
+      | %empty
 
-<additive-expression> ::= <multiplicative-expression>
-                        | <additive-expression> + <multiplicative-expression>
-                        | <additive-expression> - <multiplicative-expression>
+<break-statement> : BREAK;
 
-<multiplicative-expression> ::= <cast-expression>
-                              | <multiplicative-expression> * <cast-expression>
-                              | <multiplicative-expression> / <cast-expression>
+<line-comment> : ^%[ a-zA-Z0-9 ]*
 
-<cast-expression> ::= <unary-expression>
-                    | ( <type-name> ) <cast-expression>
+<multiline-comment> :  /* <comment> */
 
-<unary-expression> ::= ++ <unary-expression>
-                     | -- <unary-expression>
-                     | <unary-operator> <cast-expression>
-                     | sizeof <unary-expression>
-                     | sizeof <type-name>
+<comment> : <message> <newline> <comment>
+          | <message>
+          | %empty
 
-<primary-expression> ::= <identifier>
-                       | <constant>
-                       | <string>
-                       | ( <expression> )
-
-<constant> ::= <integer-constant>
-             | <character-constant>
-             | <floating-constant>
-             | <enumeration-constant>
-
-<expression> ::= <assignment-expression>
-               | <expression> , <assignment-expression>
-
-<assignment-expression> ::= <conditional-expression>
-                          | <unary-expression> <assignment-operator> <assignment-expression>
-
-<assignment-operator> ::= =
-
-<unary-operator> ::= &
-                   | *
-                   | +
-                   | -
-                   | ~
-                   | !
-
-<type-name> ::= {<specifier-qualifier>}+ {<abstract-declarator>}?
-
-<parameter-type-list> ::= <parameter-list>
-                        | <parameter-list> , ...
-
-<parameter-list> ::= <parameter-declaration>
-                   | <parameter-list> , <parameter-declaration>
-
-<parameter-declaration> ::= {<declaration-specifier>}+ <declarator>
-                          | {<declaration-specifier>}+ <abstract-declarator>
-                          | {<declaration-specifier>}+
-
-<typedef-name> ::= <identifier>
-
-<declaration> ::=  {<declaration-specifier>}+ {<init-declarator>}* ;
-
-<init-declarator> ::= <declarator>
-                    | <declarator> = <initializer>
-
-<initializer> ::= <assignment-expression>
-                | { <initializer-list> }
-                | { <initializer-list> , }
-
-<initializer-list> ::= <initializer>
-                     | <initializer-list> , <initializer>
-
-<compound-statement> ::= { {<declaration>}* {<statement>}* }
-
-<statement> ::= <expression-statement>
-              | <compound-statement>
-              | <selection-statement>
-              | <iteration-statement>
-              | <break-statement>
-
-<expression-statement> ::= {<expression>}? ;
-
-<return-statement> ::= RETURN <word> ;
-
-<selection-statement> ::= IF ( <expression> ) THEN <statement> ENDIF
-                        | IF ( <expression> ) <statement> {ELSEIF <statement>}+
-                        | SWITCH {CASE ( <expression> ) <statement>}+ {DEFAULT : <STATEMENT>}? ENDSWITCH
-
-<iteration-statement> ::= WHILE ( <expression> ) <statement> ENDWHILE
-                        | FOR ( <expression> TO <digit> STEP <digit> ) <statement> ENDFOR
-
-<break-statement> ::= BREAK;
-
-<print-statement> ::= PRINT "<word>*" {,<identifier>}* ;
-
-<main-function> ::= STARTMAIN <variable-init>? <iteration-statement>* <selection-statement>* <print-statement>* <break-statement>? ENDMAIN 
-
-<line-comment> ::= ^%[ a-zA-Z0-9 ]*
