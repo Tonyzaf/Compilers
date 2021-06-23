@@ -4,11 +4,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include "tokens.h"
-
+//#include <notmain.tab.h>
 %}
 
 %option         case-insensitive
-letter          [a-z]
+%option         noyywrap
+letter          [a-zA-Z]
 ID              [a-z][a-z0-9]*
 digit           [0-9]
 other_chars     [.\-_]
@@ -24,6 +25,7 @@ other_chars     [.\-_]
 "TYPEDEF"       {printf("Type Defintion Found\n"); return T_TDEF;}
 "PRINT"         {printf("Print Statement Found\n"); return T_PRINT;}
 "IF"            {printf("If Statement Initiated\n"); return T_IF;}
+"THEN"          {printf("Then Statement Found \n"); return T_THEN;}     
 "ENDIF"         {printf("If Statement Ended\n"); return T_ENDIF;}
 "WHILE"         {printf("Found While\n"); return T_WHILE;}
 "ENDWHILE"      {printf("While Condition Ended\n"); return T_EWHILE;}
@@ -46,9 +48,11 @@ other_chars     [.\-_]
 "AND"           {printf("Logical And Statemnt Found\n"); return T_AND;}
 "OR"            {printf("Logical Or Statement Found\n"); return T_OR;}
 
+[a-z]           {printf(""); return T_LETTER;}
 [a-z]*          {printf("Word\n"); return T_WORD;}
 [0-9]*          {printf("Number\n"); return T_NUMBER;}
 
+"="             {printf("Assign\n"); return T_ASSIGN;}
 ">"             {printf("Greater Than\n"); return T_GREATER;}
 "<"             {printf("Smaller Than\n"); return T_SMALLER;}
 "=="            {printf("Equal To\n"); return T_EQUAL;}
@@ -70,13 +74,14 @@ other_chars     [.\-_]
 ","             {printf("Comma"); return T_COMMA;}
 " "             return T_SPC;
 "\n"            {printf("New Line\n"); return T_NEWLINE; }
+"\r"            {printf("New Line\n"); return T_NEWLINE; }
 
 .               {printf("Unknown\n"); return T_UNKNWON;}
 <<EOF>>         return T_EOF;
 
 %%
 
-int main(int argc, char *argv[]){
+/*int main(int argc, char *argv[]){
 
 int token;
 
@@ -95,4 +100,4 @@ do{
 fclose(yyin);
 yyterminate();
 
-}
+}*/

@@ -1,8 +1,6 @@
-program
-
-//this is a test comment
+PROGRAM test \n
 
 FUNCTION INTEGER main (){
-    vars
+    VARS
     PRINT("TEST");
 }

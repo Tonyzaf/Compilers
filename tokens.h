@@ -53,3 +53,7 @@
 #define T_COMMA		52
 #define	T_NEWLINE	53
 #define T_UNKNWON 	54
+#define T_THEN      55
+#define T_ASSIGN    56
+#define T_COL       57
+#define T_LETTER    58
