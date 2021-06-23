@@ -1,9 +1,8 @@
 Nonterminals useless in grammar
 
-   letter
-   digit
+   newline
+   number
    word
-   name
    struct
    function
    parameters
@@ -13,7 +12,6 @@ Nonterminals useless in grammar
    type-specifier
    variable-init
    identifier
-   number
    program-command
    assign-statement
    statement
@@ -69,8 +67,7 @@ Terminals unused in grammar
    "Break"
    "AND"
    "OR"
-   "Word"
-   "Number"
+   "Digit"
    ">"
    "="
    ":"
@@ -98,18 +95,17 @@ Terminals unused in grammar
 
 Rules useless in grammar
 
-    3 letter: "Letter"
+    3 newline: "newline"
 
-    4 digit: "Number"
+    4 number: "Digit"
+    5       | number "Digit"
+    6       | "Digit" number
+    7       | %empty
 
-    5 word: letter
-    6     | digit
-    7     | word letter
-    8     | word digit
-
-    9 name: letter
-   10     | name letter
-   11     | name digit
+    8 word: "Letter"
+    9     | word "Letter"
+   10     | "Digit" word
+   11     | %empty
 
    12 struct: "Struct" name newline variable-init "End of Struct"
    13       | "TYPEDEF" "Struct" name newline variable-init name "End of Struct"
@@ -125,7 +121,7 @@ Rules useless in grammar
 
    21 function-main-body: variable-init program-command
 
-   22 return-statement: "Return" word ";"
+   22 return-statement: "Return" name ";"
 
    23 main-function: "Start Main" variable-init program-command "End Main"
 
@@ -139,91 +135,87 @@ Rules useless in grammar
    29 identifier: name
    30           | identifier identifier
 
-   31 number: digit number
-   32       | digit
-   33       | %empty
+   31 program-command: assign-statement
+   32                | iteration-statement
+   33                | selection-statement
+   34                | print-statement
+   35                | break-statement
+   36                | line-comment
+   37                | program-command program-command
+   38                | %empty
 
-   34 program-command: assign-statement
-   35                | iteration-statement
-   36                | selection-statement
-   37                | print-statement
-   38                | break-statement
-   39                | line-comment
-   40                | program-command program-command
-   41                | %empty
+   39 assign-statement: name "=" statement ";"
 
-   42 assign-statement: name "=" statement ";"
+   40 statement: word
+   41          | number
+   42          | statement statement
+   43          | "(" statement ")"
+   44          | statement unary-operator statement
 
-   43 statement: word
-   44          | digit
-   45          | statement statement
-   46          | "(" statement ")"
-   47          | statement unary-operator statement
+   45 unary-operator: "/"
+   46               | "*"
+   47               | "+"
+   48               | "-"
+   49               | "^"
 
-   48 unary-operator: "/"
-   49               | "*"
-   50               | "+"
-   51               | "-"
-   52               | "^"
+   50 condition: word logical-expression word
+   51          | number logical-expression number
+   52          | number logical-expression word
+   53          | word logical-expression number
 
-   53 condition: word logical-expression word
-   54          | digit logical-expression digit
-   55          | digit logical-expression word
-   56          | word logical-expression digit
+   54 logical-expression: ">"
+   55                   | "<"
+   56                   | "=="
+   57                   | "!="
+   58                   | "AND"
+   59                   | "OR"
 
-   57 logical-expression: ">"
-   58                   | "<"
-   59                   | "=="
-   60                   | "!="
-   61                   | "AND"
-   62                   | "OR"
+   60 iteration-statement: "While" "(" condition ")" program-command "End While"
+   61                    | "For" "(" condition "To" number "Step" number ")" program-command "End For"
 
-   63 iteration-statement: "While" "(" condition ")" program-command "End While"
-   64                    | "For" "(" condition "To" number "Step" number ")" program-command "End For"
+   62 selection-statement: "If" "(" condition ")" "Then" program-command elseif else "End if"
+   63                    | "Switch" "(" condition ")" case default "{" "Default" ":" program-command "}" "End Switch"
 
-   65 selection-statement: "If" "(" condition ")" "Then" program-command elseif else "End if"
-   66                    | "Switch" "(" condition ")" case default "{" "Default" ":" program-command "}" "End Switch"
+   64 elseif: "Else If" program-command elseif
+   65       | %empty
 
-   67 elseif: "Else If" program-command elseif
-   68       | %empty
+   66 else: "Else" program-command
+   67     | %empty
 
-   69 else: "Else" program-command
-   70     | %empty
+   68 case: "Case" "(" condition ")" program-command case
+   69     | %empty
 
-   71 case: "Case" "(" condition ")" program-command case
-   72     | %empty
+   70 default: "Default" ":" program-command
+   71        | %empty
 
-   73 default: "Default" ":" program-command
-   74        | %empty
+   72 print-statement: "Print" "(" "message" val ")" ";"
 
-   75 print-statement: "Print" "(" "message" val ")" ";"
+   73 message: word
+   74        | word message
+   75        | %empty
 
-   76 message: word
-   77        | word message
-   78        | %empty
+   76 val: val
+   77    | %empty
 
-   79 val: val
-   80    | %empty
+   78 break-statement: "Break" ";"
 
-   81 break-statement: "Break" ";"
+   79 line-comment: "//" word
+   80             | %empty
 
-   82 line-comment: "//" word
-   83             | %empty
+   81 multiline-comment: %empty
 
-   84 multiline-comment: %empty
-
-   85 comment: message newline comment
-   86        | message
-   87        | %empty
+   82 comment: message newline comment
+   83        | message
+   84        | %empty
 
 
 Grammar
 
     0 $accept: program "EOF"
 
-    1 program: "Program" newline
+    1 program: "Program1" name "newline"
 
-    2 newline: " "
+    2 name: "ID"
 
 
 Terminals, with rules where they appear
@@ -231,40 +223,40 @@ Terminals, with rules where they appear
 "EOF" (0) 0
 error (256)
 "Space" (258)
-"Letter" (259)
-"Program" (260) 1
-"Vars" (261)
-"Char" (262)
-"Int" (263)
-"Struct" (264)
-"End of Struct" (265)
-"TYPEDEF" (266)
-"Print" (267)
-"If" (268)
-"Then" (269)
-"End if" (270)
-"While" (271)
-"End While" (272)
-"Else" (273)
-"Else If" (274)
-"For" (275)
-"To" (276)
-"Step" (277)
-"End For" (278)
-"Start Main" (279)
-"End Main" (280)
-"Function" (281)
-"End Function" (282)
-"Return" (283)
-"Switch" (284)
-"Case" (285)
-"Default" (286)
-"End Switch" (287)
-"Break" (288)
-"AND" (289)
-"OR" (290)
-"Word" (291)
-"Number" (292)
+"ID" (259) 2
+"Letter" (260)
+"Program1" (261) 1
+"Vars" (262)
+"Char" (263)
+"Int" (264)
+"Struct" (265)
+"End of Struct" (266)
+"TYPEDEF" (267)
+"Print" (268)
+"If" (269)
+"Then" (270)
+"End if" (271)
+"While" (272)
+"End While" (273)
+"Else" (274)
+"Else If" (275)
+"For" (276)
+"To" (277)
+"Step" (278)
+"End For" (279)
+"Start Main" (280)
+"End Main" (281)
+"Function" (282)
+"End Function" (283)
+"Return" (284)
+"Switch" (285)
+"Case" (286)
+"Default" (287)
+"End Switch" (288)
+"Break" (289)
+"AND" (290)
+"OR" (291)
+"Digit" (292)
 ">" (293)
 "=" (294)
 ":" (295)
@@ -286,7 +278,7 @@ error (256)
 ";" (311)
 "." (312)
 "," (313)
-" " (314) 2
+"newline" (314) 1
 "Unknown" (315)
 "message" (316)
 
@@ -297,7 +289,7 @@ $accept (62)
     on left: 0
 program (63)
     on left: 1, on right: 0
-newline (64)
+name (64)
     on left: 2, on right: 1
 
 
@@ -305,18 +297,18 @@ State 0
 
     0 $accept: . program "EOF"
 
-    "Program"  shift, and go to state 1
+    "Program1"  shift, and go to state 1
 
     program  go to state 2
 
 
 State 1
 
-    1 program: "Program" . newline
+    1 program: "Program1" . name "newline"
 
-    " "  shift, and go to state 3
+    "ID"  shift, and go to state 3
 
-    newline  go to state 4
+    name  go to state 4
 
 
 State 2
@@ -328,16 +320,16 @@ State 2
 
 State 3
 
-    2 newline: " " .
+    2 name: "ID" .
 
-    $default  reduce using rule 2 (newline)
+    $default  reduce using rule 2 (name)
 
 
 State 4
 
-    1 program: "Program" newline .
+    1 program: "Program1" name . "newline"
 
-    $default  reduce using rule 1 (program)
+    "newline"  shift, and go to state 6
 
 
 State 5
@@ -345,3 +337,10 @@ State 5
     0 $accept: program "EOF" .
 
     $default  accept
+
+
+State 6
+
+    1 program: "Program1" name "newline" .
+
+    $default  reduce using rule 1 (program)

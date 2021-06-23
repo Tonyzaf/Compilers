@@ -1,6 +1,1 @@
-PROGRAM test \n
-
-FUNCTION INTEGER main (){
-    VARS
-    PRINT("TEST");
-}
+Program test 

@@ -57,3 +57,6 @@
 #define T_ASSIGN    56
 #define T_COL       57
 #define T_LETTER    58
+#define T_ID        59
+#define T_DIGIT     60
+#define T_LETTER    61

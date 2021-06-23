@@ -9,9 +9,10 @@
 
 %option         case-insensitive
 %option         noyywrap
-letter          [a-zA-Z]
+LETTER          [a-zA-Z]
 ID              [a-z][a-z0-9]*
-digit           [0-9]
+DIGIT           [0-9]
+NEWLINE         [\n]
 other_chars     [.\-_]
 
 %%
@@ -48,9 +49,9 @@ other_chars     [.\-_]
 "AND"           {printf("Logical And Statemnt Found\n"); return T_AND;}
 "OR"            {printf("Logical Or Statement Found\n"); return T_OR;}
 
-[a-z]           {printf(""); return T_LETTER;}
-[a-z]*          {printf("Word\n"); return T_WORD;}
-[0-9]*          {printf("Number\n"); return T_NUMBER;}
+{LETTER}        {printf("LETTER"); return T_LETTER;}
+{ID}            {printf("ID"); return T_ID;}   
+{DIGIT}         {printf("DIGIT"); return T_DIGIT;}      
 
 "="             {printf("Assign\n"); return T_ASSIGN;}
 ">"             {printf("Greater Than\n"); return T_GREATER;}

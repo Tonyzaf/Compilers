@@ -14,8 +14,9 @@ int error_counter,yylineno;
 %error-verbose
 
 %token  T_SPC		"Space" 
+%token  T_ID        "ID"
 %token  T_LETTER    "Letter"
-%token  T_PROG		"Program"
+%token  T_PROG		"Program1"
 %token  T_VARS		"Vars"
 %token  T_CHAR		"Char"
 %token  T_INT		"Int"
@@ -46,8 +47,8 @@ int error_counter,yylineno;
 %token  T_BREAK		"Break"
 %token  T_AND		"AND"
 %token  T_OR		"OR"
-%token  T_WORD		"Word"
-%token  T_NUMBER	"Number"
+%token  T_LETTER    "Letter"
+%token  T_DIGIT 	"Digit"
 %token  T_GREATER	">"
 %token  T_ASSIGN    "="
 %token  T_COL       ":"
@@ -69,7 +70,7 @@ int error_counter,yylineno;
 %token  T_SEMICOL	";"
 %token  T_DOT		"."
 %token  T_COMMA		","
-%token	T_NEWLINE	" "
+%token	T_NEWLINE	"newline"
 %token  T_UNKNWON 	"Unknown"
 %token  T_EOF	0   "EOF"
 
@@ -90,21 +91,20 @@ int error_counter,yylineno;
 %left   T_DIV
 %left   T_LPARENTH T_RPARENTH T_LBRACKET T_RBRACKET T_LBRACE T_RBRACE T_DOT
 
-
+%start program
 
 %%
 
-program:                     T_PROG newline ;
 
-letter:                      T_LETTER;                                                                                                     
+program:                     T_PROG name T_NEWLINE;
 
-digit:                       T_NUMBER;                                                                                                                    
-
-word:                        letter | digit  | word letter | word digit ;                                                                    
-
-name:                        letter | name letter | name digit ;                  
+name:                        T_ID ;    
 
 newline:                     T_NEWLINE;
+
+number:                      T_DIGIT | number T_DIGIT | T_DIGIT number | %empty;
+
+word:                        T_LETTER | word T_LETTER | T_DIGIT word | %empty ;
 
 struct:                      T_STRCT name newline variable-init T_ESTRCT
                                 | T_TDEF T_STRCT name newline variable-init name T_ESTRCT
@@ -120,7 +120,7 @@ parameters:                  name
 
 function-main-body:          variable-init program-command;
 
-return-statement:            T_RETURN word T_SEMICOL;
+return-statement:            T_RETURN name T_SEMICOL;
 
 main-function:               T_SMAIN variable-init program-command T_EMAIN ;
 
@@ -132,10 +132,6 @@ variable-init:               T_VARS type-specifier identifier T_SEMICOL
                                 | %empty;
 
 identifier:                  name | identifier, identifier;
-                
-number:                      digit number
-                                | digit
-                                | %empty;
 
 program-command:             assign-statement
                                 | iteration-statement
@@ -149,7 +145,7 @@ program-command:             assign-statement
 assign-statement:            name T_ASSIGN statement T_SEMICOL;
 
 statement:                   word 
-                                | digit 
+                                | number 
                                 | statement statement 
                                 | T_LPARENTH statement T_RPARENTH
                                 | statement unary-operator statement;
@@ -161,9 +157,9 @@ unary-operator:              T_DIV
                                 |T_POWER;
                   
 condition:                   word logical-expression word 
-                                | digit logical-expression digit
-                                | digit logical-expression word 
-                                | word logical-expression digit;
+                                | number logical-expression number
+                                | number logical-expression word 
+                                | word logical-expression number;
 
 logical-expression:          T_GREATER
                                 |T_SMALLER
