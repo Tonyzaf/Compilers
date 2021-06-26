@@ -3,16 +3,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "tokens.h"
-//#include <notmain.tab.h>
+#include "main.tab.h"
+
+
+
 %}
 
-%option         case-insensitive
 %option         noyywrap
+%option         yylineno
+
 LETTER          [a-zA-Z]
-ID              [a-z][a-z0-9]*
+ID              [a-z][a-z0-9]*  
 DIGIT           [0-9]
-NEWLINE         [\n]
+NUMBER          [0-9][0-9]*
+NEWLINE         \r\n
+TAB             [\t]
 other_chars     [.\-_]
 
 %%
@@ -49,9 +54,11 @@ other_chars     [.\-_]
 "AND"           {printf("Logical And Statemnt Found\n"); return T_AND;}
 "OR"            {printf("Logical Or Statement Found\n"); return T_OR;}
 
-{LETTER}        {printf("LETTER"); return T_LETTER;}
-{ID}            {printf("ID"); return T_ID;}   
-{DIGIT}         {printf("DIGIT"); return T_DIGIT;}      
+
+{ID}            {printf("ID\n"); return T_ID;}    
+{NUMBER}        {printf("NUMBER\n"); return T_NUMBER;}  
+{NEWLINE}       {printf("New Line\n"); return T_NLINE;}
+{TAB}           {}
 
 "="             {printf("Assign\n"); return T_ASSIGN;}
 ">"             {printf("Greater Than\n"); return T_GREATER;}
@@ -62,7 +69,6 @@ other_chars     [.\-_]
 "-"             {printf("Minus Sign\n"); return T_MINUS;}
 "^"             {printf("Power Sign\n"); return T_POWER;}
 "*"             {printf("Multiplication Sign\n"); return T_MULT;}
-"//"            {printf("Comment Line Found\n"); return T_COMMENT;}
 "/"             {printf("Division Sign\n"); return T_DIV;}
 "{"             {printf("Left Brace\n"); return T_LBRACE;}
 "}"             {printf("Right Brace\n"); return T_RBRACE;}
@@ -71,34 +77,16 @@ other_chars     [.\-_]
 "("             {printf("Left Parenthesis\n"); return T_LPARENTH;}
 ")"             {printf("Right Parenthesis\n"); return T_RPARENTH;}
 ";"             {printf("Semicolon\n"); return T_SEMICOL;}
-"."             {printf("Dot"); return T_DOT;}
-","             {printf("Comma"); return T_COMMA;}
-" "             return T_SPC;
-"\n"            {printf("New Line\n"); return T_NEWLINE; }
-"\r"            {printf("New Line\n"); return T_NEWLINE; }
+":"             {printf("Column\n"); return T_COL;}
+"."             {printf("Dot\n"); return T_DOT;}
+","             {printf("Comma\n"); return T_COMMA;}
+"\""            {printf("Tonos\n"); return T_TONOS;}
+" "             {   }
+"%"             {printf("Line Comment"); return T_COMMENT;}
 
-.               {printf("Unknown\n"); return T_UNKNWON;}
+
 <<EOF>>         return T_EOF;
 
+.               {printf("Unknown\n");}
+
 %%
-
-/*int main(int argc, char *argv[]){
-
-int token;
-
-if(argc > 1){
-    yyin = fopen(argv[1], "r");
-    if (yyin == NULL){
-        perror("Error opening file");
-        return -1;
-    }
-}
-
-do{
-    token = yylex();
-}while(token != 0);
-
-fclose(yyin);
-yyterminate();
-
-}*/
