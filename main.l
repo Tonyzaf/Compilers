@@ -85,7 +85,7 @@ other_chars     [.\-_]
 "%"             {printf("Line Comment"); return T_COMMENT;}
 
 
-<<EOF>>         return T_EOF;
+<<EOF>>         {printf("Translation Complete!\n");return T_EOF;}
 
 .               {printf("Unknown\n");}
 
