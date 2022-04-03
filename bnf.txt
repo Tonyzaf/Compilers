@@ -1,0 +1,119 @@
+<program> :              PROGRAM <id>  <newline>  <struct> <function> <main> EOF
+                                
+<id> :                        [a-z][a-z0-9]*
+                                
+<newline> :                [\r\n]
+                                
+<struct> :                  <struct_type>  <newline> struct
+                                |ε
+                                
+<struct_type> :         STRUCT <id>  <newline> <varksm> <id>  ENDSTRUCT
+                                |TYPEDEF STRUCT <id>  <newline> <varksm> <id>  ENDSTRUCT
+                                
+<function>  :              FUNCTION <id>  ( <var> )  <newline>   <varksm>   <functionbody>   <return>        ENDFUNCTION <newline>
+                                |<function> <function>              
+                                |ε
+                                
+<varksm> :                 VARS <vartype> <var> ; <newline>
+                                |<varksm> <varksm>
+                                |ε
+                                
+<vartype> :                CHAR
+                                |INTEGER 
+                                
+<var>  :                      <id> 
+                                |<id>  , <var> 
+                                |ε
+                                                               
+
+<functionbody> :        <command>
+                                |<functionbody> <command>
+                                |ε
+                                
+<command> :              <assignment> <newline>
+                                |<loop> <newline>
+                                |<check> <newline>
+                                |<print> <newline>
+                                |<break> <newline>
+                                |<comment> <newline>
+                                |<mcomment> <newline>
+                                
+<assignment> :           <id>  =  <expression> ;
+                                
+<expression> :           <literal>
+                                |<id> ( <var> )
+                                |<id>  [ T_NUMBER ]
+                                |<operation>
+                                
+<operation> :             <literal> <noperator> <literal>
+                                |<operation> <noperator> <operation>
+                                |<operation> <noperator> <literal>
+                                |<literal> <noperator> <operation>
+                                |( <operation> )
+                                
+<literal>:                   <number>
+                                |<id> 
+                                                        
+<number>:               [0-9][0-9]*
+
+<noperator> :             +
+                                | -
+                                | ^
+                                | *
+                                | /
+                                
+<loop> :                      <forloop>
+                                |<whileloop>
+                                
+<forloop> :                 FOR <id> = <number> TO <number> STEP <number> <newline> <functionbody> ENDFOR
+                                
+<whileloop> :             WHILE ( <condition> ) <newline> <functionbody> ENDWHILE
+                              
+<condition> :             <literal> <operators> <literal>                               
+
+<operators> :             <loperator>
+                                |<coperator>
+                                
+<loperator> :              <
+                                | >
+                                | ==
+                                | !=
+                              
+<coperator> :            AND
+                                |OR
+                                
+<check> :                  <checkif>
+                                |<checkcase>
+                                
+<checkif> :              IF ( <condition> ) THEN <newline> <functionbody>  ENDIF
+                              |IF (<condition>) THEN <newline> <functionbody> ELSE <newline> <functionbody> ENDIF
+                              |IF (<condition>) THEN <newline> <functionbody> <elseif> ELSE <newline> <functionbody>  ENDIF
+                                
+<elseif> :                   ELSEIF <newline> <functionbody> 
+                                |<elseif> <elseif>
+                                
+<checkcase> :            SWITCH ( <expression> ) <newline> <case> <default> ENDSWITCH
+                                
+<case> :                     CASE ( <expression> ) : <newline> <functionbody>
+                                | <case> <case>
+                                
+<default> :                DEFAULT : <newline> <functionbody>
+                                |ε                                                                                                                      
+<print> :                    PRINT (“ <message> “ , \[ <var> \] ) ;
+
+<message> :               < literal >
+                                |< literal > <message>
+                                |ε
+                                
+<break> :                  BREAK ;
+
+<comment> :             % <message>
+                    
+<mcomment> :           /* <messages> */
+                               
+<messages> :             < message >
+                                |<message> <newline> <messages>
+                                
+<return> :                 RETURN <literal> ; <newline>
+                                
+<main> :                    STARTMAIN <newline> <varksm> <functionbody> ENDMAIN
