@@ -1166,7 +1166,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 #line 88 "main.l"
+<<<<<<< HEAD
 {printf("Translation Successfull! \n"); return T_EOF;}
+=======
+{printf("Translation Complete!\n");return T_EOF;}
+>>>>>>> 7e170cfe4df30d620bb7c00226cdaa4c922a5cf7
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
